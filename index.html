@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Mulk — Your possessions, in one wallet</title>
+<meta name="description" content="Mulk is a wallet for your possessions across the GCC — real estate with live valuations, plus watches, cars and plates in interactive 3D."/>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  :root{--bg:#070d1a;--bg2:#0a1322;--card:#0d1526;--card2:#14213c;--gold:#c9a24b;--gold2:#e6c37a;--text:#f2f5fa;--mut:#8b99b8;--faint:#5a688a;--line:rgba(255,255,255,.08);--up:#2ebd85}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  /* nav */
+  header{position:sticky;top:0;z-index:50;background:rgba(7,13,26,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{font-weight:800;letter-spacing:.26em;font-size:19px}.brand span{color:var(--gold)}
+  .tabs{display:flex;gap:6px;align-items:center}
+  .tabs a{font-size:13px;font-weight:600;color:var(--mut);padding:8px 13px;border-radius:999px;cursor:pointer;transition:.15s}
+  .tabs a:hover{color:var(--text)}.tabs a.on{color:var(--gold)}
+  .dl{background:var(--gold);color:#0a1120;font-weight:800;font-size:12.5px;padding:9px 15px;border-radius:999px;cursor:pointer}
+  /* view toggling */
+  .view{display:none;animation:rise .4s ease}.view.on{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* hero */
+  .hero{text-align:center;padding:70px 0 40px;position:relative;overflow:hidden}
+  .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(60% 60% at 50% 0%,rgba(201,162,75,.14),transparent 70%);pointer-events:none}
+  .eyebrow{color:var(--gold2);font-weight:700;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase}
+  h1{font-size:clamp(32px,6vw,58px);font-weight:800;letter-spacing:-.02em;margin:14px 0 12px;line-height:1.05}
+  h1 span{color:var(--gold)}
+  .sub{color:var(--mut);font-size:clamp(15px,2.5vw,18px);max-width:640px;margin:0 auto 26px}
+  .badges{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .badge{display:flex;align-items:center;gap:9px;background:#000;border:1px solid var(--line);border-radius:14px;padding:10px 16px;cursor:pointer;transition:.15s}
+  .badge:hover{border-color:var(--gold)}
+  .badge .s{font-size:10px;color:var(--mut);line-height:1}.badge .b{font-size:15px;font-weight:700;line-height:1.2}
+  .badge svg{width:22px;height:22px;fill:var(--text)}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:44px 0}
+  .stat{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:22px 16px;text-align:center}
+  .stat .n{font-size:clamp(24px,4vw,34px);font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums}
+  .stat .l{font-size:12px;color:var(--mut);margin-top:5px}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+  /* sections */
+  section.block{padding:56px 0;border-top:1px solid var(--line)}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 30px}
+  .sec-head .kx{color:var(--gold2);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  .sec-head h2{font-size:clamp(24px,4vw,36px);font-weight:800;margin:10px 0 8px;letter-spacing:-.01em}
+  .sec-head p{color:var(--mut);font-size:15px}
+  .stage{height:420px;border-radius:22px;overflow:hidden;background:radial-gradient(120% 100% at 50% 12%,#17253f 0%,#0a1120 55%,#05070f 100%);border:1px solid var(--line);position:relative}
+  model-viewer{width:100%;height:100%}
+  .stage .tag{position:absolute;left:16px;top:14px;z-index:5;font-size:11px;color:var(--mut);background:rgba(13,21,38,.7);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  .stage iframe{width:100%;height:100%;border:0}
+  .feat{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:22px}
+  .feat .f{flex:1;min-width:220px;max-width:320px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .feat .f b{color:var(--text);font-size:14px}.feat .f p{color:var(--mut);font-size:12.5px;margin-top:4px}
+  /* real estate mini chart */
+  .re-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:center}
+  @media(max-width:760px){.re-grid{grid-template-columns:1fr}}
+  .re-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:20px;padding:22px}
+  .re-card h3{font-size:15px}.re-card .big{font-size:40px;font-weight:800;color:var(--gold2);margin:8px 0 2px;font-variant-numeric:tabular-nums}
+  .re-card .mut{color:var(--mut);font-size:12.5px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .chips span{font-size:11.5px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  /* cta */
+  .cta{margin:20px 0 8px;text-align:center;background:linear-gradient(180deg,#14213c,#0d1526);border:1px solid var(--line);border-radius:24px;padding:44px 20px}
+  .cta h2{font-size:clamp(24px,4vw,34px);font-weight:800}
+  .cta p{color:var(--mut);margin:8px auto 22px;max-width:520px}
+  /* about / contact */
+  .prose{max-width:720px;margin:0 auto;padding:50px 0}
+  .prose h2{font-size:30px;font-weight:800;margin-bottom:6px}
+  .prose .kx{color:var(--gold2);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  .prose p{color:var(--mut);font-size:15.5px;margin-top:16px}
+  .prose h3{margin-top:28px;font-size:18px}
+  .vals{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+  @media(max-width:640px){.vals{grid-template-columns:1fr}}
+  .val{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .val b{color:var(--gold2)}.val p{margin-top:6px;font-size:13px}
+  .cform{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+  .cform input,.cform textarea{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text);font-family:inherit;font-size:14px;outline:none}
+  .cform input:focus,.cform textarea:focus{border-color:var(--gold)}
+  .cform button{background:var(--gold);color:#0a1120;font-weight:800;border:0;border-radius:12px;padding:13px;cursor:pointer;font-family:inherit;font-size:14px}
+  .contact-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
+  .contact-row a{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--faint);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <div class="brand">MULK<span>.</span></div>
+  <div class="tabs">
+    <a data-view="home" class="on">Home</a>
+    <a data-view="about">About</a>
+    <a data-view="contact">Contact</a>
+  </div>
+  <div class="dl" data-view="home" onclick="document.getElementById('download').scrollIntoView()">Download</div>
+</div></header>
+
+<!-- ================= HOME ================= -->
+<main id="home" class="view on">
+  <section class="hero"><div class="wrap">
+    <div class="eyebrow">The possession wallet for the GCC</div>
+    <h1>Everything you own,<br/><span>in one wallet.</span></h1>
+    <p class="sub">Track your real estate with live GCC valuations — then your watches, cars and plate numbers as interactive 3D collectibles. Real estate first; more asset types rolling out.</p>
+    <div class="badges">
+      <a class="badge"><svg viewBox="0 0 24 24"><path d="M16.4 12.9c0-2.2 1.8-3.3 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.5 1.1 8.6.7 1 1.5 2.2 2.6 2.2 1 0 1.4-.7 2.7-.7 1.2 0 1.6.7 2.7.7 1.1 0 1.8-1 2.5-2 .8-1.2 1.1-2.3 1.1-2.3s-2.1-.8-2.1-3.6zM14.7 6.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.9 2.6 1 .1 2-.5 2.5-1.2z"/></svg><span><span class="s">Coming soon on</span><br/><span class="b">App Store</span></span></a>
+      <a class="badge"><svg viewBox="0 0 24 24"><path d="M3.6 2.3c-.3.3-.5.8-.5 1.4v16.6c0 .6.2 1.1.5 1.4l.1.1 9.3-9.3v-.2L3.6 2.3zm12.5 12.4l-3.1-3.1 3.1-3.1 3.7 2.1c1 .6 1 1.5 0 2.1l-3.7 2zM12.9 11.3L15.7 8.5 5.2 2.5c-.4-.2-.8-.2-1.1-.1l8.8 8.9zM4.1 21.6c.3.1.7 0 1.1-.2l10.5-6-2.8-2.8-8.8 9z"/></svg><span><span class="s">Coming soon on</span><br/><span class="b">Google Play</span></span></a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n" id="s1">131,000+</div><div class="l">Real-estate records</div></div>
+      <div class="stat"><div class="n" id="s2">4,800+</div><div class="l">Neighbourhoods tracked</div></div>
+      <div class="stat"><div class="n">6</div><div class="l">GCC states · 7 emirates</div></div>
+      <div class="stat"><div class="n">6 yrs</div><div class="l">Price history</div></div>
+    </div>
+  </div></section>
+
+  <!-- Real estate -->
+  <section class="block"><div class="wrap">
+    <div class="sec-head"><div class="kx">Start with real estate</div><h2>Live valuations across the Gulf</h2>
+      <p>Your portfolio, valued daily against official price data from all six GCC states — Saudi &amp; Dubai down to the deal, the rest via official market indices.</p></div>
+    <div class="re-grid">
+      <div class="re-card">
+        <h3>What's in the database</h3>
+        <div class="big" id="s3">131,394</div>
+        <div class="mut">verified real-estate transaction records &amp; official market figures</div>
+        <div class="chips"><span>🇧🇭 Bahrain</span><span>🇸🇦 Saudi Arabia</span><span>🇦🇪 UAE · 7 emirates</span><span>🇶🇦 Qatar</span><span>🇰🇼 Kuwait</span><span>🇴🇲 Oman</span></div>
+        <div class="chips"><span>Updated daily</span><span>Official sources: DLD · MoJ · SLRB · NCSI · PSA · ADREC</span></div>
+      </div>
+      <div class="re-card">
+        <h3>6-year price trend</h3>
+        <svg viewBox="0 0 320 150" style="width:100%;height:150px;margin-top:10px">
+          <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9a24b" stop-opacity=".35"/><stop offset="1" stop-color="#c9a24b" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,120 L40,110 L80,112 L120,95 L160,80 L200,72 L240,50 L280,40 L320,28 L320,150 L0,150 Z" fill="url(#g)"/>
+          <path d="M0,120 L40,110 L80,112 L120,95 L160,80 L200,72 L240,50 L280,40 L320,28" fill="none" stroke="#c9a24b" stroke-width="2.4"/>
+        </svg>
+        <div class="mut">Indexed GCC residential prices, 2020–2026 · <span style="color:var(--up);font-weight:700">▲ steady</span></div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- Watch 3D -->
+  <section class="block"><div class="wrap">
+    <div class="sec-head"><div class="kx">Your watches</div><h2>Scan a watch in 60 seconds</h2>
+      <p>Tilt it through every angle — Mulk rebuilds it as a rotatable 3D piece in your wallet, with make, year and live value. Drag to rotate.</p></div>
+    <div class="stage"><span class="tag">3D preview · your scan renders in full detail</span>
+      <model-viewer src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb"
+        alt="3D preview" camera-controls auto-rotate rotation-per-second="20deg" environment-image="neutral" shadow-intensity="1" exposure="1.1" touch-action="pan-y" interaction-prompt="none"></model-viewer>
+    </div>
+    <div class="feat">
+      <div class="f"><b>60-second capture</b><p>One guided video pass, on-device — no tapping 100 photos.</p></div>
+      <div class="f"><b>Rotate &amp; AR</b><p>View it from every angle, or place it in your space with AR.</p></div>
+      <div class="f"><b>Live value</b><p>Matched to reference &amp; market data for an up-to-date estimate.</p></div>
+    </div>
+  </div></section>
+
+  <!-- Car 3D -->
+  <section class="block"><div class="wrap">
+    <div class="sec-head"><div class="kx">Your cars</div><h2>The whole car, in your pocket</h2>
+      <p>Walk around it once and keep it forever — a photoreal 3D model of your car, in the wallet. Drag to rotate.</p></div>
+    <div class="stage"><span class="tag">3D preview</span>
+      <model-viewer src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ToyCar/glTF-Binary/ToyCar.glb"
+        alt="3D car preview" camera-controls auto-rotate rotation-per-second="24deg" environment-image="neutral" shadow-intensity="1" exposure="1.2" camera-orbit="45deg 70deg 4m" touch-action="pan-y" interaction-prompt="none"></model-viewer>
+    </div>
+  </div></section>
+
+  <!-- Plate 3D -->
+  <section class="block"><div class="wrap">
+    <div class="sec-head"><div class="kx">Your plate numbers</div><h2>A collectible for your plate</h2>
+      <p>Every GCC private-plate format, at true proportions — a rotatable gold-framed collectible. Pick a country and rotate.</p></div>
+    <div class="stage"><iframe title="Plate viewer" src="https://abuhejji.github.io/mulk-plates/" loading="lazy"></iframe></div>
+  </div></section>
+
+  <!-- Download CTA -->
+  <section class="block" id="download"><div class="wrap">
+    <div class="cta">
+      <h2>Put your whole world in Mulk</h2>
+      <p>Real estate today; watches, cars and plates as we roll them out. Be first to know when we launch.</p>
+      <div class="badges" style="justify-content:center">
+        <a class="badge"><svg viewBox="0 0 24 24"><path d="M16.4 12.9c0-2.2 1.8-3.3 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.4 0-2.8.8-3.5 2.1-1.5 2.6-.4 6.5 1.1 8.6.7 1 1.5 2.2 2.6 2.2 1 0 1.4-.7 2.7-.7 1.2 0 1.6.7 2.7.7 1.1 0 1.8-1 2.5-2 .8-1.2 1.1-2.3 1.1-2.3s-2.1-.8-2.1-3.6zM14.7 6.3c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.9 2.6 1 .1 2-.5 2.5-1.2z"/></svg><span><span class="s">Coming soon on</span><br/><span class="b">App Store</span></span></a>
+        <a class="badge"><svg viewBox="0 0 24 24"><path d="M3.6 2.3c-.3.3-.5.8-.5 1.4v16.6c0 .6.2 1.1.5 1.4l.1.1 9.3-9.3v-.2L3.6 2.3zm12.5 12.4l-3.1-3.1 3.1-3.1 3.7 2.1c1 .6 1 1.5 0 2.1l-3.7 2zM12.9 11.3L15.7 8.5 5.2 2.5c-.4-.2-.8-.2-1.1-.1l8.8 8.9zM4.1 21.6c.3.1.7 0 1.1-.2l10.5-6-2.8-2.8-8.8 9z"/></svg><span><span class="s">Coming soon on</span><br/><span class="b">Google Play</span></span></a>
+      </div>
+    </div>
+  </div></section>
+</main>
+
+<!-- ================= ABOUT ================= -->
+<div id="about" class="view"><div class="wrap prose">
+  <div class="kx">About us</div>
+  <h2>A wallet for what you own</h2>
+  <p>Mulk (ملك — "possession") is building the GCC's possession wallet. We started with the region's most valuable asset — real estate — giving owners live valuations across all six Gulf states, drawn from official land-department and statistics data.</p>
+  <p>But not everyone owns a building. Many people's most treasured possessions are their watch, their car, or a prized plate number. So Mulk turns each of those into an interactive, valued 3D piece you can keep in the same wallet — captured from your own belongings in seconds.</p>
+  <h3>What we believe</h3>
+  <div class="vals">
+    <div class="val"><b>Ownership, made real.</b><p>Your possessions, rendered and valued — not just listed.</p></div>
+    <div class="val"><b>Real data only.</b><p>Valuations built on official, sourced figures — never guesses.</p></div>
+    <div class="val"><b>Built for the Gulf.</b><p>Every GCC state, in Arabic and English, from day one.</p></div>
+  </div>
+  <p style="margin-top:26px">Launching in the Kingdom of Bahrain, expanding across the GCC.</p>
+</div></div>
+
+<!-- ================= CONTACT ================= -->
+<div id="contact" class="view"><div class="wrap prose">
+  <div class="kx">Contact us</div>
+  <h2>Get in touch</h2>
+  <p>Questions, partnerships, or want to be first to try Mulk? Leave a note and we'll get back to you.</p>
+  <form class="cform" onsubmit="event.preventDefault();this.style.display='none';document.getElementById('sent').style.display='block'">
+    <input required placeholder="Your name"/>
+    <input required type="email" placeholder="Email address"/>
+    <textarea rows="4" placeholder="Your message"></textarea>
+    <button type="submit">Send message</button>
+  </form>
+  <p id="sent" style="display:none;color:var(--up);font-weight:700">Thanks — we'll be in touch shortly.</p>
+  <div class="contact-row">
+    <a href="mailto:hello@mulk.app">✉ hello@mulk.app</a>
+    <a>📍 Manama, Kingdom of Bahrain</a>
+  </div>
+  <p style="font-size:12px;color:var(--faint);margin-top:18px">Note: this form is a preview — connect it to your inbox before launch.</p>
+</div></div>
+
+<footer><div class="wrap">© 2026 Mulk · ملك — the possession wallet for the GCC · Preview site</div></footer>
+
+<script>
+  var tabs=document.querySelectorAll('.tabs a[data-view]'), views={home:document.getElementById('home'),about:document.getElementById('about'),contact:document.getElementById('contact')};
+  function show(v){for(var k in views){views[k].classList.toggle('on',k===v);}tabs.forEach(function(t){t.classList.toggle('on',t.dataset.view===v);});window.scrollTo(0,0);}
+  tabs.forEach(function(t){t.onclick=function(){show(t.dataset.view);};});
+  document.querySelector('.dl').onclick=function(){show('home');setTimeout(function(){document.getElementById('download').scrollIntoView({behavior:'smooth'});},60);};
+  // count-up for the headline stat
+  var el=document.getElementById('s3'), target=131394, t0=null;
+  function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/1400);el.textContent=Math.round(target*(1-Math.pow(1-k,3))).toLocaleString();if(k<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+</script>
+</body>
+</html>
