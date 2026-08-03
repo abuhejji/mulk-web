@@ -153,7 +153,7 @@
       <div class="f"><b>Rotate &amp; AR</b><p>View it from every angle, or place it in your space with AR.</p></div>
       <div class="f"><b>Live value</b><p>Matched to reference &amp; market data for an up-to-date estimate.</p></div>
     </div>
-    <p style="text-align:center;color:var(--gold2);font-size:12.5px;margin-top:18px;font-weight:600">Reference library: 51 brands · 240+ models · 750+ dial-colour variants · values from official retail</p>
+    <p style="text-align:center;color:var(--gold2);font-size:12.5px;margin-top:18px;font-weight:600">Reference library: <span id="wb">51</span> brands · <span id="wm">240</span> models · <span id="wv">750</span> dial-colour variants · values from official retail</p>
   </div></section>
 
   <!-- Car 3D -->
@@ -164,7 +164,8 @@
       <model-viewer src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ToyCar/glTF-Binary/ToyCar.glb"
         alt="3D car preview" camera-controls auto-rotate rotation-per-second="24deg" environment-image="neutral" shadow-intensity="1" exposure="1.2" camera-orbit="45deg 70deg 4m" touch-action="pan-y" interaction-prompt="none"></model-viewer>
     </div>
-    <p style="text-align:center;color:var(--gold2);font-size:12.5px;margin-top:18px;font-weight:600">Garage library: 52 Gulf-market makes · 85 models · 440+ factory colour options</p>
+    <p style="text-align:center;color:var(--gold2);font-size:12.5px;margin-top:18px;font-weight:600">Garage library: <span id="cm">52</span> Gulf-market makes · <span id="cmo">85</span> models · <span id="cc">440</span> factory colour options</p>
+    <p style="text-align:center;color:var(--gold2);font-size:12.5px;margin-top:8px;font-weight:600">Atelier library: <span id="bb">20</span> handbag houses · <span id="bm">91</span> models · <span id="bv">337</span> colour variants · values from retail × live resale index</p>
   </div></section>
 
   <!-- Plate 3D -->
@@ -228,10 +229,26 @@
   function show(v){for(var k in views){views[k].classList.toggle('on',k===v);}tabs.forEach(function(t){t.classList.toggle('on',t.dataset.view===v);});window.scrollTo(0,0);}
   tabs.forEach(function(t){t.onclick=function(){show(t.dataset.view);};});
   document.querySelector('.dl').onclick=function(){show('home');setTimeout(function(){document.getElementById('download').scrollIntoView({behavior:'smooth'});},60);};
-  // count-up for the headline stat
-  var el=document.getElementById('s3'), target=131394, t0=null;
-  function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/1400);el.textContent=Math.round(target*(1-Math.pow(1-k,3))).toLocaleString();if(k<1)requestAnimationFrame(step);}
-  requestAnimationFrame(step);
+  // Live figures from the Mulk master database (refreshed automatically every morning at 06:00).
+  var SB_URL='https://xgqnenkkfxkpevdyppuf.supabase.co/rest/v1/mulk_public_stats?select=*';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncW5lbmtrZnhrcGV2ZHlwcHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTI1NjcsImV4cCI6MjA5ODc2ODU2N30.qT6ffPiWDX9rUnvGEVg9e3wmNfDuo3G4LBADz6aGqbI';
+  var reTarget=131394, animated=false;
+  function animate(el,target){var t0=null;function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/1400);el.textContent=Math.round(target*(1-Math.pow(1-k,3))).toLocaleString();if(k<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+  function setTxt(id,v){var e=document.getElementById(id);if(e&&v!=null)e.textContent=Number(v).toLocaleString();}
+  function runS3(){if(animated)return;animated=true;var s3=document.getElementById('s3');if(s3)animate(s3,reTarget);}
+  fetch(SB_URL,{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}})
+    .then(function(r){return r.json();})
+    .then(function(a){var d=a&&a[0];if(!d){runS3();return;}
+      reTarget=d.re_records;
+      var s1=document.getElementById('s1');if(s1)s1.textContent=Number(d.re_records).toLocaleString()+'+';
+      var s2=document.getElementById('s2');if(s2)s2.textContent=Number(d.re_areas).toLocaleString()+'+';
+      setTxt('wb',d.watch_brands);setTxt('wm',d.watch_models);setTxt('wv',d.watch_variants);
+      setTxt('cm',d.car_makes);setTxt('cmo',d.car_models);setTxt('cc',d.car_colors);
+      setTxt('bb',d.bag_brands);setTxt('bm',d.bag_models);setTxt('bv',d.bag_variants);
+      runS3();
+    })
+    .catch(function(){runS3();});
+  setTimeout(runS3,2000);
 </script>
 </body>
 </html>
