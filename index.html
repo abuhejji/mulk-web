@@ -84,6 +84,33 @@
   .contact-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
   .contact-row a{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600}
   footer{border-top:1px solid var(--line);padding:26px 0;color:var(--faint);font-size:12px;text-align:center}
+  /* nav dropdown */
+  .ddwrap{position:relative;display:inline-block}
+  .ddwrap>a::after{content:' ▾';font-size:10px;opacity:.7}
+  .ddmenu{display:none;position:absolute;top:100%;left:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:158px;z-index:60;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+  .ddwrap:hover .ddmenu,.ddwrap.open .ddmenu{display:block}
+  .ddmenu a{display:block;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--mut);white-space:nowrap;cursor:pointer}
+  .ddmenu a:hover{background:rgba(255,255,255,.06);color:var(--text)}
+  /* methodology */
+  .mth-hero{text-align:center;max-width:720px;margin:0 auto}
+  .badge-std{display:inline-flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--gold);border-radius:999px;padding:9px 17px;color:var(--gold2);font-size:12.5px;font-weight:600;margin:14px auto}
+  .mth-principle{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:18px auto;max-width:720px;text-align:center;font-size:15px;line-height:1.65;color:var(--text)}
+  .ladder{max-width:660px;margin:22px auto;display:flex;flex-direction:column;gap:10px}
+  .rung{display:flex;align-items:flex-start;gap:14px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:14px 16px}
+  .rung .rn{width:30px;height:30px;flex:none;border-radius:50%;background:var(--gold);color:#0a1120;font-weight:800;display:grid;place-items:center;font-size:14px}
+  .rung .rt{font-weight:700;font-size:14px}.rung .rd{font-size:12.5px;color:var(--mut);margin-top:3px;line-height:1.5}
+  .rung.primary{border-left-color:var(--up)}.rung.primary .rn{background:var(--up);color:#062}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px;margin:18px auto}
+  .mcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .mcard h4{font-size:14px;margin-bottom:7px;color:var(--gold2)}.mcard p{font-size:13px;color:var(--mut);line-height:1.55}
+  .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:860px;margin:22px auto}
+  .acard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .acard .ah{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px}.acard .ah .ai{font-size:22px}
+  .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:11px}
+  .flow span{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:#c7d0e2;font-size:11.5px}
+  .flow .ar{color:var(--gold);border:0;background:transparent;padding:0}
+  .acard .amap{font-size:11px;color:var(--faint);margin-top:11px}
+  @media(max-width:640px){.two,.mgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -91,7 +118,12 @@
   <div class="brand">MULK<span>.</span></div>
   <div class="tabs">
     <a data-view="home" class="on">Home</a>
-    <a data-view="about">About</a>
+    <div class="ddwrap"><a class="ddtoggle">About</a>
+      <div class="ddmenu">
+        <a data-view="about">About us</a>
+        <a data-view="methodology">Methodology</a>
+      </div>
+    </div>
     <a data-view="contact">Contact</a>
   </div>
   <div class="dl" data-view="home" onclick="document.getElementById('download').scrollIntoView()">Download</div>
@@ -214,6 +246,57 @@
 </div></div>
 
 <!-- ================= CONTACT ================= -->
+<div id="methodology" class="view"><div class="wrap prose">
+  <div class="mth-hero">
+    <div class="eyebrow">Methodology</div>
+    <h2 style="font-size:clamp(24px,4vw,34px);font-weight:800;margin:8px 0">How Mulk values what you own</h2>
+    <p class="sub" style="margin:0 auto 6px">Every asset is valued on the same disciplined basis — its real, observed market value, never a guess. Our approach follows the internationally recognised valuation principles that underpin the WTO Customs Valuation framework: <b style="color:var(--text)">fair, uniform and neutral</b>, and grounded first in an asset's actual transaction value.</p>
+    <div style="text-align:center"><span class="badge-std">◈ Aligned with WTO Customs Valuation principles · Article VII, GATT 1994</span></div>
+  </div>
+
+  <div class="mth-principle">We value on <b>actual market transactions first</b>. Where a direct transaction isn't available, we step — in a defined order — to comparable sales, then to market-derived estimates, exactly as the international standard prescribes. Nothing is arbitrary or fictitious.</div>
+
+  <h3 style="text-align:center;margin:30px 0 4px;font-size:20px">The valuation hierarchy</h3>
+  <p style="text-align:center;color:var(--mut);font-size:13px;max-width:560px;margin:0 auto">Applied in order — each step is used only when the one above it isn't available.</p>
+  <div class="ladder">
+    <div class="rung primary"><div class="rn">1</div><div><div class="rt">Transaction value</div><div class="rd">The actual price paid in a real, arm's-length sale — the primary basis for every valuation.</div></div></div>
+    <div class="rung"><div class="rn">2</div><div><div class="rt">Identical assets</div><div class="rd">The transaction value of the same asset — matched on model, reference, area or specification.</div></div></div>
+    <div class="rung"><div class="rn">3</div><div><div class="rt">Similar assets</div><div class="rd">Closely comparable assets that are commercially interchangeable with the one being valued.</div></div></div>
+    <div class="rung"><div class="rn">4</div><div><div class="rt">Deductive value</div><div class="rd">Worked back from resale prices, adjusted for the costs and margins between markets.</div></div></div>
+    <div class="rung"><div class="rn">5</div><div><div class="rt">Computed value</div><div class="rd">Built up from replacement or retail cost plus the premium the market pays.</div></div></div>
+    <div class="rung"><div class="rn">6</div><div><div class="rt">Reasoned estimate</div><div class="rd">For rare or one-of-a-kind assets, a reasoned estimate consistent with all of the above and the best available data.</div></div></div>
+  </div>
+
+  <h3 style="text-align:center;margin:34px 0 4px;font-size:20px">Two sides of every market</h3>
+  <div class="two">
+    <div class="mcard"><h4>◔ Primary market</h4><p>New-issue and first-sale activity — the values at which assets first enter the market.</p></div>
+    <div class="mcard"><h4>◕ Secondary market</h4><p>Resale, auction and private-sale activity — what assets actually change hands for today.</p></div>
+  </div>
+  <p style="text-align:center;color:var(--mut);font-size:13px;max-width:640px;margin:6px auto 0">Mulk blends both sides continuously, so a valuation reflects the living market — not just list prices. Figures refresh every day.</p>
+
+  <h3 style="text-align:center;margin:34px 0 4px;font-size:20px">By asset class</h3>
+  <div class="mgrid">
+    <div class="acard"><div class="ah"><span class="ai">🏙️</span> Real estate</div>
+      <div class="flow"><span>Registered transactions</span><span class="ar">→</span><span>Neighbourhood comparables</span><span class="ar">→</span><span>Tracked index</span></div>
+      <div class="amap">Primarily transaction value &amp; comparable sales — hierarchy steps 1–3.</div></div>
+    <div class="acard"><div class="ah"><span class="ai">⌚</span> Watches</div>
+      <div class="flow"><span>Secondary-market sales</span><span class="ar">→</span><span>Reference match</span><span class="ar">→</span><span>Retail anchor</span></div>
+      <div class="amap">Comparable sales, anchored to computed retail value — steps 2, 3 &amp; 5.</div></div>
+    <div class="acard"><div class="ah"><span class="ai">🚗</span> Cars</div>
+      <div class="flow"><span>Market listings</span><span class="ar">→</span><span>Similar spec &amp; year</span><span class="ar">→</span><span>Depreciation curve</span></div>
+      <div class="amap">Similar-asset value with deductive adjustment — steps 1, 3 &amp; 4.</div></div>
+    <div class="acard"><div class="ah"><span class="ai">🔢</span> Plate numbers</div>
+      <div class="flow"><span>Auction &amp; private-sale comps</span><span class="ar">→</span><span>Rarity tier</span><span class="ar">→</span><span>Reasoned estimate</span></div>
+      <div class="amap">Similar-sale comps plus a reasoned estimate for rarity — steps 3 &amp; 6.</div></div>
+    <div class="acard"><div class="ah"><span class="ai">👜</span> Handbags</div>
+      <div class="flow"><span>Retail value</span><span class="ar">→</span><span>Live resale ratio</span><span class="ar">→</span><span>Condition</span></div>
+      <div class="amap">Computed retail with deductive resale adjustment — steps 4 &amp; 5.</div></div>
+    <div class="acard" style="display:flex;flex-direction:column;justify-content:center;background:linear-gradient(180deg,var(--card2),var(--card))"><div class="ah"><span class="ai">🔄</span> Always current</div>
+      <p style="color:var(--mut);font-size:13px;line-height:1.55;margin-top:8px">Every class is re-valued automatically each morning, drawing on a broad range of primary and secondary market data across the GCC and beyond.</p></div>
+  </div>
+  <p style="text-align:center;color:var(--faint);font-size:11px;max-width:640px;margin:20px auto 0">Mulk valuations are informational estimates derived from market data, not formal appraisals. Rare and unique assets can vary widely — owners can flag any figure for review.</p>
+</div></div>
+
 <div id="contact" class="view"><div class="wrap prose">
   <div class="kx">Contact us</div>
   <h2>Get in touch</h2>
@@ -235,8 +318,10 @@
 <footer><div class="wrap">© 2026 Mulk · ملك — the possession wallet for the GCC · Preview site</div></footer>
 
 <script>
-  var tabs=document.querySelectorAll('.tabs a[data-view]'), views={home:document.getElementById('home'),about:document.getElementById('about'),contact:document.getElementById('contact')};
-  function show(v){for(var k in views){views[k].classList.toggle('on',k===v);}tabs.forEach(function(t){t.classList.toggle('on',t.dataset.view===v);});window.scrollTo(0,0);}
+  var tabs=document.querySelectorAll('.tabs a[data-view]'), views={home:document.getElementById('home'),about:document.getElementById('about'),methodology:document.getElementById('methodology'),contact:document.getElementById('contact')};
+  function show(v){for(var k in views){if(views[k])views[k].classList.toggle('on',k===v);}tabs.forEach(function(t){t.classList.toggle('on',t.dataset.view===v);});var dw=document.querySelector('.ddwrap');if(dw)dw.classList.remove('open');window.scrollTo(0,0);}
+  var ddt=document.querySelector('.ddtoggle');
+  if(ddt){ddt.onclick=function(e){e.stopPropagation();ddt.parentNode.classList.toggle('open');};document.addEventListener('click',function(){ddt.parentNode.classList.remove('open');});}
   tabs.forEach(function(t){t.onclick=function(){show(t.dataset.view);};});
   document.querySelector('.dl').onclick=function(){show('home');setTimeout(function(){document.getElementById('download').scrollIntoView({behavior:'smooth'});},60);};
   // Live figures from the Mulk master database (refreshed automatically every morning at 06:00).
