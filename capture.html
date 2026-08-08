@@ -9,11 +9,10 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
-  #app{position:fixed;inset:0;display:flex;flex-direction:column}
+  #app{position:fixed;inset:0}
   .screen{position:absolute;inset:0;display:none;flex-direction:column}
   .screen.on{display:flex}
-  /* start */
-  #start{padding:26px 22px;justify-content:center;gap:18px;text-align:center;background:radial-gradient(120% 90% at 50% 10%,#17253f 0%,#070d1a 60%)}
+  #start{padding:24px 22px;justify-content:center;gap:16px;text-align:center;background:radial-gradient(120% 90% at 50% 10%,#17253f 0%,#070d1a 60%);overflow:auto}
   .wordmark{font-size:20px;font-weight:800;letter-spacing:.24em}.wordmark span{color:var(--gold)}
   h1{font-size:24px;font-weight:800;margin-top:6px}
   .lead{color:var(--mut);font-size:14px;line-height:1.55;max-width:420px;margin:0 auto}
@@ -23,7 +22,6 @@
   .btn{background:var(--gold);color:#0a1120;font-weight:800;font-size:15px;padding:15px 22px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;max-width:420px;margin:6px auto 0;width:100%}
   .btn.sec{background:transparent;color:var(--mut);border:1px solid var(--line)}
   .note{color:var(--mut);font-size:11.5px;max-width:420px;margin:0 auto;line-height:1.5}
-  /* scan */
   #scan{background:#000}
   video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   #ovl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -35,7 +33,6 @@
   .hint{color:#fff;font-size:14px;font-weight:600;margin-bottom:14px;text-shadow:0 1px 6px #000}
   .row{display:flex;gap:10px;justify-content:center;max-width:420px;margin:0 auto}
   .row .btn{margin:0}
-  /* results */
   #done{background:var(--bg);overflow:auto;padding:22px 18px}
   .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
   .gal .cell{aspect-ratio:1;border-radius:12px;overflow:hidden;background:repeating-conic-gradient(#1b2438 0% 25%,#141c2e 0% 50%) 50%/16px 16px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
@@ -53,13 +50,15 @@
   <section id="start" class="screen on">
     <div class="wordmark">MULK<span>.</span></div>
     <h1>Scan your asset in 3D</h1>
-    <p class="lead">Slowly move your phone <b style="color:var(--text)">around</b> the item — Mulk captures it from every angle and isolates it from everything else.</p>
+    <p class="lead">Turn the item slowly through a full circle — Mulk captures every angle and isolates it from everything around it.</p>
     <div class="tips">
       <b>For a clean scan</b>
       <ul>
-        <li>Put the item on a plain surface — <b style="color:var(--text)">don't hold it</b> (a hand covers what we need to see).</li>
-        <li>Even, soft light. Avoid harsh glare on metal or glass.</li>
-        <li>Move the camera slowly in a full circle, then a little higher and lower.</li>
+        <li>Put it on a <b style="color:var(--text)">clean, empty surface</b> — nothing else in frame.</li>
+        <li><b style="color:var(--text)">Don't hold it</b>: a hand hides the surface we need to see.</li>
+        <li><b style="color:var(--text)">Soft bags slouch</b> — lightly stuff it so it keeps its shape. Leaning is fine.</li>
+        <li>Rotate it slowly on the spot (a turntable / lazy-Susan is perfect), <b style="color:var(--text)">or</b> move around it.</li>
+        <li>Even, soft light. Avoid glare on hardware, leather sheen or glass.</li>
       </ul>
     </div>
     <button class="btn" id="go">Open camera</button>
@@ -74,12 +73,12 @@
       <ellipse id="ring" cx="50" cy="52" rx="34" ry="24" fill="none" stroke="#c9a24b" stroke-width="1.1" stroke-dasharray="0 999"/>
     </svg>
     <div class="scan-top">
-      <span class="pill" id="angles">0 / 36 angles</span>
+      <span class="pill" id="angles">0 / 30 views</span>
       <span class="pill" id="segpill">isolating…</span>
     </div>
     <div class="scan-bot">
       <div class="cov"><i id="covbar"></i></div>
-      <div class="hint" id="hint">Move slowly around your item…</div>
+      <div class="hint" id="hint">Rotate the item slowly, all the way around…</div>
       <div class="row">
         <button class="btn sec" id="cancel" style="flex:1">Cancel</button>
         <button class="btn" id="finish" style="flex:2">Done · build frames</button>
@@ -92,7 +91,7 @@
     <div class="wordmark" style="text-align:center">MULK<span>.</span></div>
     <h1 style="text-align:center;font-size:21px;margin-top:8px">Captured &amp; isolated</h1>
     <div class="stat-line">
-      <div class="s"><b id="rN">0</b><span>angles</span></div>
+      <div class="s"><b id="rN">0</b><span>views</span></div>
       <div class="s"><b id="rCov">0%</b><span>coverage</span></div>
       <div class="s"><b id="rSeg">on</b><span>background removed</span></div>
     </div>
@@ -104,7 +103,7 @@
   </section>
 
   <!-- RETAKE -->
-  <section id="reject" class="screen" style="background:radial-gradient(120% 90% at 50% 10%,#2a1420 0%,#070d1a 60%);padding:26px 22px;justify-content:center;gap:16px;text-align:center">
+  <section id="reject" class="screen" style="background:radial-gradient(120% 90% at 50% 10%,#2a1420 0%,#070d1a 60%);padding:26px 22px;justify-content:center;gap:16px;text-align:center;overflow:auto">
     <div class="wordmark">MULK<span>.</span></div>
     <h1 style="color:#f6c453">Let's redo that scan</h1>
     <p class="lead">The capture didn't pass the quality check. Fix the points below and re-scan — a clean scan is what makes an accurate 3D.</p>
@@ -118,12 +117,11 @@
 const $ = id => document.getElementById(id);
 const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); };
 
-const BUCKETS = 36;                 // 10° each
-let buckets = new Array(BUCKETS).fill(false), covered = 0;
-let frames = [];                    // {canvas}
-let stream = null, seg = null, segReady = false, timer = null, lastAlpha = null;
+const TARGET = 30;                 // distinct views for a full turn
+let frames = [], kept = 0, lastLuma = null, scanning = false, stale = 0;
+let stream = null, seg = null, segReady = false, loopT = null, safT = null;
 
-// ---- load the interactive segmenter (tap-free: we use the centre point) ----
+// ---- on-device object isolation (interactive segmenter, centre point) ----
 async function loadSeg(){
   try{
     const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
@@ -140,6 +138,8 @@ const video = $('video');
 const cap = document.createElement('canvas'); const cctx = cap.getContext('2d');
 const tiny = document.createElement('canvas'); tiny.width=24; tiny.height=24; const tctx = tiny.getContext('2d');
 function stats(canvas){ tctx.drawImage(canvas,0,0,24,24); const d=tctx.getImageData(0,0,24,24).data; let s=0,ss=0; const n=24*24; for(let i=0;i<d.length;i+=4){ const l=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; s+=l; ss+=l*l; } const m=s/n; return {lum:m, contrast:Math.sqrt(Math.max(0,ss/n-m*m))}; }
+function lumaArr(canvas){ tctx.drawImage(canvas,0,0,24,24); const d=tctx.getImageData(0,0,24,24).data; const a=new Float32Array(576); for(let i=0,j=0;i<d.length;i+=4,j++){ a[j]=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; } return a; }
+function mad(a,b){ let s=0; for(let i=0;i<a.length;i++) s+=Math.abs(a[i]-b[i]); return s/a.length; }
 
 function drawFrame(){
   const w = video.videoWidth, h = video.videoHeight; if(!w) return null;
@@ -150,62 +150,56 @@ function drawFrame(){
   return c;
 }
 
-function addAngle(b){
-  if(buckets[b]) return; buckets[b]=true; covered++;
-  const c = drawFrame(); if(c){ const st=stats(c); frames.push({canvas:c, lum:st.lum, contrast:st.contrast}); }
-  $('angles').textContent = covered+' / '+BUCKETS+' angles';
-  $('covbar').style.width = Math.round(covered/BUCKETS*100)+'%';
-  $('ring').setAttribute('stroke-dasharray', (covered/BUCKETS*Math.PI*2*30).toFixed(1)+' 999');
-  if(covered>=8) $('hint').textContent = 'Great — keep going for full coverage…';
-  if(covered>=BUCKETS-2) $('hint').textContent = 'Coverage complete — tap Done.';
+function updateProgress(){
+  $('angles').textContent = kept+' / '+TARGET+' views';
+  const pct = Math.min(1, kept/TARGET);
+  $('covbar').style.width = Math.round(pct*100)+'%';
+  $('ring').setAttribute('stroke-dasharray', (pct*Math.PI*2*30).toFixed(1)+' 999');
 }
 
-function onOrient(e){
-  if(e.alpha==null) return;
-  lastAlpha = e.alpha;
-  const b = Math.floor((((e.alpha%360)+360)%360)/(360/BUCKETS));
-  addAngle(b);
+// Coverage advances when the VIEW changes — works whether you spin the item
+// on a turntable or walk around it. No compass/full-360 walk required.
+function loop(){
+  if(!scanning) return;
+  const c = drawFrame();
+  if(c){
+    const la = lumaArr(c);
+    const diff = lastLuma ? mad(lastLuma, la) : 999;
+    if(diff > 6.5){                        // a genuinely new angle
+      const st = stats(c);
+      frames.push({canvas:c, lum:st.lum, contrast:st.contrast});
+      lastLuma = la; kept++; stale = 0; updateProgress();
+      $('hint').textContent = kept >= Math.floor(TARGET*0.75) ? 'Almost there — a few more angles…' : 'Nice — keep rotating slowly…';
+    } else {
+      stale++;
+      if(stale > 6) $('hint').textContent = 'Keep turning — we need new angles.';
+    }
+  }
+  if(kept >= TARGET){ finish(); return; }
+  loopT = setTimeout(loop, 300);
 }
 
 async function startCamera(){
-  // iOS motion permission (needs a user gesture — this runs from the button)
-  try{
-    if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
-      await DeviceOrientationEvent.requestPermission().catch(()=>{});
-    }
-  }catch(_){}
-  window.addEventListener('deviceorientation', onOrient, true);
-
   try{
     stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:1280} }, audio:false });
-  }catch(err){
-    alert('Could not open the camera: '+err.message+'\nPlease allow camera access and use https.'); return;
-  }
+  }catch(err){ alert('Could not open the camera: '+err.message+'\nPlease allow camera access and open this over https.'); return; }
   video.srcObject = stream; await video.play();
   show('scan');
-
-  // Fallback: if no motion sensor fires within 2.5s, capture on a timer instead
-  let sawMotion = false; const mark = ()=>{ sawMotion = true; window.removeEventListener('deviceorientation', mkFlag, true); };
-  const mkFlag = ()=>mark(); window.addEventListener('deviceorientation', mkFlag, true);
-  setTimeout(()=>{
-    if(!sawMotion){
-      $('hint').textContent = 'Move around your item…';
-      let i=0; timer = setInterval(()=>{ if(covered>=BUCKETS){clearInterval(timer);return;} addAngle(i%BUCKETS); i++; }, 1600);
-    }
-  }, 2500);
+  scanning = true; kept = 0; lastLuma = null; stale = 0; frames = [];
+  updateProgress();
+  $('hint').textContent = 'Rotate the item slowly, all the way around…';
+  loop();
+  safT = setTimeout(()=>{ if(scanning) finish(); }, 90000);   // 90s safety cap
 }
 
 async function finish(){
-  if(timer) clearInterval(timer);
-  window.removeEventListener('deviceorientation', onOrient, true);
+  scanning = false; if(loopT) clearTimeout(loopT); if(safT) clearTimeout(safT);
   if(stream){ stream.getTracks().forEach(t=>t.stop()); }
 
-  // lighting aggregate
   const lums=frames.map(f=>f.lum||0), cons=frames.map(f=>f.contrast||0);
   const avgLum = lums.length? lums.reduce((a,b)=>a+b,0)/lums.length : 128;
   const avgCon = cons.length? cons.reduce((a,b)=>a+b,0)/cons.length : 40;
 
-  // segment each frame + measure how cleanly the item isolates
   const cutouts=[]; let fgSum=0, fgN=0, glare=0;
   for(const f of frames.slice(0,18)){
     let outURL=f.canvas.toDataURL('image/png'), fgFrac=null;
@@ -231,11 +225,11 @@ async function finish(){
 
   // ---- QUALITY GATE: refuse a poor scan and prompt to redo ----
   const reasons=[];
-  if(covered < 10) reasons.push(['Not enough angles','Move all the way around the item until the ring fills.']);
+  if(kept < 12) reasons.push(['Not enough angles','Rotate the item slowly all the way around until the ring fills — spin it on the spot or move around it.']);
   if(avgLum < 55) reasons.push(['Too dark','Find brighter, even light so the whole item is clearly lit.']);
   else if(avgLum > 225) reasons.push(['Overexposed','Reduce harsh light so the item isn’t washed out.']);
   if(avgCon < 16) reasons.push(['Low contrast with the surface','Use a plain surface that stands out from the item.']);
-  if(avgGlare > 0.22) reasons.push(['Too much glare','Angle away from direct light — reflections on metal/glass break the scan.']);
+  if(avgGlare > 0.22) reasons.push(['Too much glare','Angle away from direct light — reflections on hardware, leather or glass break the scan.']);
   if(avgFg!=null && avgFg < 0.04) reasons.push(['Item not clearly detected','Fill more of the frame and keep the surface empty.']);
   else if(avgFg!=null && avgFg > 0.72) reasons.push(['Clutter or a hand in view','Clear the surface — remove hands, other objects and busy backgrounds — then re-scan.']);
 
@@ -244,20 +238,20 @@ async function finish(){
     show('reject'); return;
   }
 
-  // passed → show isolated frames
   const gal=$('gal'); gal.innerHTML='';
   cutouts.forEach(u=>{ const cell=document.createElement('div'); cell.className='cell'; const img=new Image(); img.src=u; cell.appendChild(img); gal.appendChild(cell); });
-  $('rN').textContent=frames.length; $('rCov').textContent=Math.round(covered/BUCKETS*100)+'%';
+  $('rN').textContent=frames.length; $('rCov').textContent=Math.min(100,Math.round(kept/TARGET*100))+'%';
   $('rSeg').textContent=(segReady && avgFg!=null)?'on':'off';
   $('segwarn').style.display=(segReady && avgFg!=null)?'none':'block';
   show('done');
 }
 
-function reset(){ buckets=new Array(BUCKETS).fill(false); covered=0; frames=[]; $('angles').textContent='0 / '+BUCKETS+' angles'; $('covbar').style.width='0'; $('ring').setAttribute('stroke-dasharray','0 999'); }
+function stopAll(){ scanning=false; if(loopT) clearTimeout(loopT); if(safT) clearTimeout(safT); if(stream){ stream.getTracks().forEach(t=>t.stop()); } }
+function reset(){ frames=[]; kept=0; lastLuma=null; stale=0; $('angles').textContent='0 / '+TARGET+' views'; $('covbar').style.width='0'; $('ring').setAttribute('stroke-dasharray','0 999'); }
 
 $('go').addEventListener('click', ()=>{ reset(); loadSeg(); startCamera(); });
 $('finish').addEventListener('click', finish);
-$('cancel').addEventListener('click', ()=>{ if(stream) stream.getTracks().forEach(t=>t.stop()); if(timer) clearInterval(timer); window.removeEventListener('deviceorientation', onOrient, true); show('start'); });
+$('cancel').addEventListener('click', ()=>{ stopAll(); show('start'); });
 $('again').addEventListener('click', ()=>{ reset(); show('start'); });
 $('retry').addEventListener('click', ()=>{ reset(); show('start'); });
 </script>
