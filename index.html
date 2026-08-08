@@ -121,13 +121,12 @@
   .act-title h2{font-size:clamp(26px,5vw,46px);font-weight:800;margin-top:6px}
   .s3d{position:relative;z-index:2;width:min(76vw,500px);transition:transform .08s linear;transform-style:preserve-3d;will-change:transform;filter:drop-shadow(0 34px 54px rgba(0,0,0,.55))}
   .s3d svg{width:100%;height:auto;display:block}
-  .co{position:absolute;z-index:4;max-width:236px;opacity:0;transform:translateY(24px);transition:opacity .5s,transform .5s;background:rgba(13,21,38,.72);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+  .co{position:absolute;z-index:4;left:0;right:0;margin:0 auto;bottom:13%;max-width:540px;text-align:center;opacity:0;transform:translateY(16px);transition:opacity .4s,transform .4s;background:rgba(9,15,29,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;padding:15px 20px}
   .co.show{opacity:1;transform:none}
-  .co b{color:var(--gold2);font-size:13.5px}.co p{color:var(--mut);font-size:12px;margin-top:4px;line-height:1.5}
-  .co.tl{top:22%;left:5%}.co.rr{top:42%;right:5%}.co.bl{bottom:15%;left:8%}
+  .co b{color:var(--gold2);font-size:16px}.co p{color:var(--text);font-size:13.5px;margin-top:5px;line-height:1.5}
   .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:var(--faint);font-size:12px;z-index:3;letter-spacing:.1em;animation:sh 1.8s ease-in-out infinite}
   @keyframes sh{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,6px)}}
-  @media(max-width:640px){.co{max-width:156px;padding:10px 12px}.co.tl{left:3%;top:19%}.co.rr{right:3%}.co.bl{left:4%}.s3d{width:84vw}}
+  @media(max-width:640px){.co{max-width:88vw;bottom:9%;padding:12px 15px}.co b{font-size:15px}.s3d{width:84vw}}
 </style>
 </head>
 <body>
@@ -223,12 +222,7 @@
     <div class="act" data-rot="150">
       <div class="act-sticky"><div class="act-bg"></div>
         <div class="act-title"><div class="kx">Your plate numbers</div><h2>A collectible that turns</h2></div>
-        <div class="s3d"><svg viewBox="0 0 540 168" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="5" width="530" height="158" rx="16" fill="#f6f6f2" stroke="#c9a24b" stroke-width="7"/>
-          <rect x="18" y="18" width="504" height="132" rx="9" fill="none" stroke="#d9c48f" stroke-width="1.5"/>
-          <text x="270" y="66" font-size="27" text-anchor="middle" fill="#1a2a5e" font-weight="800" font-family="Arial, sans-serif">BAHRAIN · البحرين</text>
-          <text x="270" y="132" font-size="52" text-anchor="middle" fill="#1a2a5e" font-weight="800" font-family="Arial, sans-serif" letter-spacing="8">7</text>
-        </svg></div>
+        <div class="s3d" id="plateStage" style="width:min(80vw,540px)"></div>
         <div class="co tl" data-at="0.22"><b>Every GCC format</b><p>At true proportions, in a gold frame you can turn.</p></div>
         <div class="co rr" data-at="0.55"><b>Rarity, valued</b><p>Low digits and prized patterns priced from real auction &amp; classified data.</p></div>
         <div class="co bl" data-at="0.82"><b>Yours to keep</b><p>A living collectible for the number you own.</p></div>
@@ -404,6 +398,18 @@
     .catch(function(){runS3();});
   setTimeout(runS3,2000);
 
+  // ---- Real refined Bahrain plate (same renderer as the plate viewer) ----
+  (function(){
+    var NAVY="#1a2a5e";
+    function emb(t,x,y,s,fill,anchor,ls){var a=anchor||"middle",f=' font-family="Arial, Helvetica, sans-serif" font-weight="800" text-anchor="'+a+'" letter-spacing="'+(ls==null?0:ls)+'"';return '<text x="'+(x+1.5)+'" y="'+(y+1.5)+'" font-size="'+s+'" fill="#00000042"'+f+'>'+t+'</text><text x="'+(x-1)+'" y="'+(y-1)+'" font-size="'+s+'" fill="#ffffff8c"'+f+'>'+t+'</text><text x="'+x+'" y="'+y+'" font-size="'+s+'" fill="'+fill+'"'+f+'>'+t+'</text>';}
+    function txt(t,x,y,s,fill,anchor,extra){return '<text x="'+x+'" y="'+y+'" font-size="'+s+'" fill="'+fill+'" font-family="Arial, Helvetica, sans-serif" text-anchor="'+(anchor||"middle")+'" '+(extra||'')+'>'+t+'</text>';}
+    function bhFlag(x,y,w,h){var wb=w*0.30,tooth=w*0.16,seg=h/5,p="M0,0 L"+wb+",0";for(var i=0;i<5;i++){p+=" L"+(wb+tooth)+","+((i+0.5)*seg)+" L"+wb+","+((i+1)*seg);}p+=" L0,"+h+" Z";return '<g transform="translate('+x+','+y+')"><rect width="'+w+'" height="'+h+'" fill="#ce1126" stroke="#0006" stroke-width="1"/><path d="'+p+'" fill="#fff"/></g>';}
+    function bhMicro(id){return '<pattern id="'+id+'" width="160" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)"><text x="0" y="11" font-size="7" fill="#e8ebf1" font-family="Arial">مملكة البحرين · KINGDOM OF BAHRAIN</text></pattern>';}
+    var n="344992", s=72, cy=91;
+    var svg='<svg viewBox="0 0 560 132" xmlns="http://www.w3.org/2000/svg"><defs>'+bhMicro("mb1")+'</defs><rect x="2" y="2" width="556" height="128" rx="12" fill="#f8f8f4" stroke="#1c1c1c" stroke-width="3"/><rect x="6" y="6" width="548" height="120" rx="9" fill="url(#mb1)" opacity="0.5"/>'+bhFlag(24,42,80,50)+emb(n,250,cy,s,NAVY,"middle",1)+txt("البحرين",548,56,27,NAVY,"end",'font-weight="700" textLength="92" lengthAdjust="spacingAndGlyphs"')+emb("BAHRAIN",548,94,22,NAVY,"end",1)+'</svg>';
+    var el=document.getElementById('plateStage'); if(el) el.innerHTML=svg;
+  })();
+
   // ---- Scroll-driven showcase: each asset rotates + callouts fade in ----
   (function(){
     var acts=[].slice.call(document.querySelectorAll('.act')), ticking=false;
@@ -416,7 +422,7 @@
         var s=a.querySelector('.s3d');
         if(s) s.style.transform='rotateY('+((p-0.5)*rot).toFixed(2)+'deg)';
         var cos=a.querySelectorAll('.co');
-        for(var i=0;i<cos.length;i++){var at=parseFloat(cos[i].getAttribute('data-at'));cos[i].classList.toggle('show',Math.abs(p-at)<0.17);}
+        for(var i=0;i<cos.length;i++){var at=parseFloat(cos[i].getAttribute('data-at'));cos[i].classList.toggle('show',Math.abs(p-at)<0.15);}
       });
       ticking=false;
     }
