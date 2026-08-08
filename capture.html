@@ -5,22 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Mulk · Scan your asset</title>
 <style>
-  :root{--bg:#070d1a;--card:#0d1526;--gold:#c9a24b;--gold2:#e6c37a;--text:#f2f5fa;--mut:#8b99b8;--line:rgba(255,255,255,.1);--up:#2ebd85}
+  :root{--bg:#070d1a;--card:#0d1526;--card2:#14213c;--gold:#c9a24b;--gold2:#e6c37a;--text:#f2f5fa;--mut:#8b99b8;--line:rgba(255,255,255,.1);--up:#2ebd85}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
   #app{position:fixed;inset:0}
   .screen{position:absolute;inset:0;display:none;flex-direction:column}
   .screen.on{display:flex}
-  #start{padding:24px 22px;justify-content:center;gap:16px;text-align:center;background:radial-gradient(120% 90% at 50% 10%,#17253f 0%,#070d1a 60%);overflow:auto}
+  #pick,#start{padding:24px 22px;justify-content:center;gap:16px;text-align:center;background:radial-gradient(120% 90% at 50% 10%,#17253f 0%,#070d1a 60%);overflow:auto}
   .wordmark{font-size:20px;font-weight:800;letter-spacing:.24em}.wordmark span{color:var(--gold)}
   h1{font-size:24px;font-weight:800;margin-top:6px}
   .lead{color:var(--mut);font-size:14px;line-height:1.55;max-width:420px;margin:0 auto}
+  .pick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:420px;margin:8px auto 0}
+  .pick-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:22px 14px;cursor:pointer;transition:.15s}
+  .pick-card:hover,.pick-card:active{border-color:var(--gold)}
+  .pick-card .ic{font-size:40px;line-height:1}
+  .pick-card .nm{font-weight:800;font-size:15px;margin-top:10px}
+  .pick-card .ds{font-size:11.5px;color:var(--mut);margin-top:3px;line-height:1.4}
   .tips{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;text-align:left;max-width:420px;margin:6px auto 0}
   .tips b{color:var(--gold2);font-size:13px}
   .tips li{color:var(--mut);font-size:13px;margin:8px 0 0 18px;line-height:1.5}
   .btn{background:var(--gold);color:#0a1120;font-weight:800;font-size:15px;padding:15px 22px;border:0;border-radius:999px;cursor:pointer;font-family:inherit;max-width:420px;margin:6px auto 0;width:100%}
   .btn.sec{background:transparent;color:var(--mut);border:1px solid var(--line)}
+  .link{color:var(--mut);font-size:12.5px;text-decoration:underline;cursor:pointer;background:none;border:0;font-family:inherit}
   .note{color:var(--mut);font-size:11.5px;max-width:420px;margin:0 auto;line-height:1.5}
   #scan{background:#000}
   video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -37,8 +44,7 @@
   .row{display:flex;gap:10px;justify-content:center;max-width:420px;margin:0 auto}
   .row .btn{margin:0}
   .flipcard{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(4,8,16,.88);backdrop-filter:blur(6px);padding:26px;text-align:center}
-  .flipcard .ic{font-size:46px}
-  .flipcard h2{font-size:21px;font-weight:800}
+  .flipcard .ic{font-size:46px}.flipcard h2{font-size:21px;font-weight:800}
   .flipcard p{color:var(--mut);font-size:14px;max-width:360px;line-height:1.55}
   #done{background:var(--bg);overflow:auto;padding:22px 18px}
   .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
@@ -53,24 +59,29 @@
 <body>
 <div id="app">
 
-  <!-- START -->
-  <section id="start" class="screen on">
+  <!-- PICK ASSET -->
+  <section id="pick" class="screen on">
     <div class="wordmark">MULK<span>.</span></div>
-    <h1>Scan your asset in 3D</h1>
-    <p class="lead">Turn the item slowly through a full circle — Mulk captures every angle, <b style="color:var(--text)">including the bottom / back</b>, and isolates it from everything around it.</p>
-    <div class="tips">
-      <b>For a clean scan</b>
-      <ul>
-        <li>Put it on a <b style="color:var(--text)">clean, empty surface</b> — nothing else in frame.</li>
-        <li><b style="color:var(--text)">Don't hold it</b>: a hand hides the surface we need to see.</li>
-        <li><b style="color:var(--text)">Soft bags slouch</b> — lightly stuff it so it keeps its shape. Leaning is fine.</li>
-        <li>Rotate it slowly on the spot (a turntable is perfect), or move around it.</li>
-        <li><b style="color:var(--text)">You'll be prompted to turn it over</b> to capture the bottom / case-back (glass exhibition backs included).</li>
-        <li>Even, soft light. Avoid glare on hardware, leather sheen or glass.</li>
-      </ul>
+    <h1>What are you scanning?</h1>
+    <p class="lead">Pick the asset type — Mulk tailors the capture to it.</p>
+    <div class="pick-grid">
+      <div class="pick-card" data-asset="watch"><div class="ic">⌚</div><div class="nm">Watch</div><div class="ds">Dial, sides &amp; case-back</div></div>
+      <div class="pick-card" data-asset="bag"><div class="ic">👜</div><div class="nm">Handbag</div><div class="ds">All sides &amp; the base</div></div>
+      <div class="pick-card" data-asset="car"><div class="ic">🚗</div><div class="nm">Car</div><div class="ds">A full walk-around lap</div></div>
+      <div class="pick-card" data-asset="plate"><div class="ic">🔢</div><div class="nm">Number plate</div><div class="ds">Front, straight &amp; angled</div></div>
     </div>
+    <p class="note">More asset types roll out with the app. Real estate is valued from records, not scanned.</p>
+  </section>
+
+  <!-- START / TIPS (tailored per asset) -->
+  <section id="start" class="screen">
+    <div class="wordmark">MULK<span>.</span></div>
+    <h1 id="startTitle">Scan your asset</h1>
+    <p class="lead" id="startLead">Capture every angle — Mulk isolates it from everything around it.</p>
+    <div class="tips"><b id="tipsHead">For a clean scan</b><ul id="tipsList"></ul></div>
     <button class="btn" id="go">Open camera</button>
-    <p class="note">Your camera runs on your device. Frames are processed locally to remove the background; nothing is uploaded by this prototype. Building the final 3D model is a separate step.</p>
+    <button class="link" id="back">‹ Change asset</button>
+    <p class="note">Your camera runs on your device. Frames are processed locally to remove the background; nothing is uploaded by this prototype. Building the final 3D model runs on Mulk's reconstruction step.</p>
   </section>
 
   <!-- SCAN -->
@@ -87,7 +98,7 @@
     <div id="live" class="livebar ok">✓ Looks good</div>
     <div class="scan-bot">
       <div class="cov"><i id="covbar"></i></div>
-      <div class="hint" id="hint">Rotate the item slowly, all the way around…</div>
+      <div class="hint" id="hint">Move slowly around your item…</div>
       <div class="row">
         <button class="btn sec" id="cancel" style="flex:1">Cancel</button>
         <button class="btn" id="finish" style="flex:2">Done · build frames</button>
@@ -95,8 +106,8 @@
     </div>
     <div id="flip" class="flipcard">
       <div class="ic">🔄</div>
-      <h2>Now turn it over</h2>
-      <p>Show the <b style="color:var(--text)">bottom / case-back</b> and keep rotating slowly — this captures the underside (glass exhibition case-backs included). Then continue.</p>
+      <h2 id="flipTitle">Now turn it over</h2>
+      <p id="flipMsg">Show the other side and keep rotating slowly, then continue.</p>
       <button class="btn" id="flipgo" style="max-width:300px">Continue scanning</button>
     </div>
   </section>
@@ -110,11 +121,11 @@
       <div class="s"><b id="rCov">0%</b><span>coverage</span></div>
       <div class="s"><b id="rSeg">on</b><span>background removed</span></div>
     </div>
-    <p class="note" style="text-align:center">All-around views — sides plus the bottom/back — with the hand, table and background stripped away. This is what a reconstruction engine turns into your 3D model.</p>
+    <p class="note" style="text-align:center" id="doneLead">All-around views with the background stripped away — what Mulk's reconstruction turns into your 3D model.</p>
     <div class="gal" id="gal"></div>
     <p class="warn" id="segwarn" style="display:none">Background-removal model couldn't load on this device — showing raw frames. On the native app this runs on-device automatically.</p>
     <button class="btn" id="again" style="margin-top:8px">Scan again</button>
-    <p class="note" style="text-align:center;margin-top:12px">Next step (not in this prototype): these masked frames are sent to photogrammetry / Gaussian-splat reconstruction (native SDK or cloud) to produce the <b style="color:var(--text)">.glb</b> that drops into your wallet.</p>
+    <p class="note" style="text-align:center;margin-top:12px">Next step: these masked frames go to Mulk's reconstruction (on-device Object Capture / cloud) to produce the <b style="color:var(--text)">.glb</b> that drops into your wallet.</p>
   </section>
 
   <!-- RETAKE -->
@@ -132,7 +143,25 @@
 const $ = id => document.getElementById(id);
 const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); };
 
-const TARGET = 30, P1 = 18;        // 18 side views, then a flip for bottom/back
+// ---- per-asset capture configuration ----
+const ASSETS = {
+  watch:{ name:'Watch', target:30, p1:18, flip:true, skin:true, minFg:0.04, maxFg:0.6,
+    startHint:'Rotate the watch slowly, all the way around…',
+    flipTitle:'Now show the case-back', flipMsg:'Turn it over and slowly show the case-back — glass exhibition backs included — then continue.',
+    tips:['Put it on a clean, empty surface — nothing else in frame.','Don’t hold it — a hand hides the dial and case.','Even, soft light. Avoid glare on the crystal and polished steel.','You’ll be prompted to flip it for the case-back.'] },
+  bag:{ name:'Handbag', target:30, p1:18, flip:true, skin:true, minFg:0.05, maxFg:0.62,
+    startHint:'Rotate the bag slowly, all the way around…',
+    flipTitle:'Now show the bottom', flipMsg:'Turn it over and slowly show the underside/base, then continue.',
+    tips:['Clean, empty surface — nothing else in frame.','Don’t hold it — set it down.','Soft bags slouch — lightly stuff it so it holds shape. Leaning is fine.','You’ll be prompted to show the bottom.'] },
+  car:{ name:'Car', target:40, p1:40, flip:false, skin:false, minFg:0.15, maxFg:0.96,
+    startHint:'Walk slowly all the way around the car…',
+    tips:['Park somewhere open with even light — shade or overcast is best.','Walk one slow full lap: front, both sides and rear.','Keep the whole car inside the ring.','Avoid strong reflections and hard shadows on the paint and glass.'] },
+  plate:{ name:'Number plate', target:14, p1:14, flip:false, skin:false, minFg:0.08, maxFg:0.88,
+    startHint:'Move around the plate — straight on, then slight angles…',
+    tips:['Lay the plate flat on a clean surface, or hold it against a plain wall.','Fill the ring with the plate — straight on and from slight angles.','Even light — avoid glare on the reflective coating.','Keep it mostly front-on; a few tilts add depth.'] }
+};
+let CFG = ASSETS.watch;
+
 let frames = [], kept = 0, lastLuma = null, scanning = false, stale = 0;
 let phase = 1, checkpoint = false, segFg = null, lastSegT = 0;
 let stream = null, seg = null, segReady = false, loopT = null, safT = null;
@@ -168,40 +197,36 @@ function drawFrame(){
 }
 
 function updateProgress(){
-  $('angles').textContent = kept+' / '+TARGET+' views';
-  const pct = Math.min(1, kept/TARGET);
+  $('angles').textContent = kept+' / '+CFG.target+' views';
+  const pct = Math.min(1, kept/CFG.target);
   $('covbar').style.width = Math.round(pct*100)+'%';
   $('ring').setAttribute('stroke-dasharray', (pct*Math.PI*2*30).toFixed(1)+' 999');
 }
-
 function setLive(reason){
   const el = $('live');
   if(reason){ el.textContent = '⚠ '+reason; el.className = 'livebar bad'; $('ring').setAttribute('stroke','#f6465d'); }
   else { el.textContent = '✓ Looks good'; el.className = 'livebar ok'; $('ring').setAttribute('stroke','#c9a24b'); }
 }
+function enterCheckpoint(){ checkpoint = true; if(loopT) clearTimeout(loopT); $('flipTitle').textContent=CFG.flipTitle||'Now turn it over'; $('flipMsg').textContent=CFG.flipMsg||''; $('flip').style.display='flex'; }
 
-function enterCheckpoint(){ checkpoint = true; if(loopT) clearTimeout(loopT); $('flip').style.display = 'flex'; }
-
-// Coverage advances only when the VIEW changes AND the frame is clean.
 function loop(){
   if(!scanning || checkpoint) return;
   const c = drawFrame();
   if(c){
     const td = grabTiny(c);
     const st = stats(td);
-    const skin = skinFrac(td);
+    const skin = CFG.skin ? skinFrac(td) : 0;
     const now = performance.now();
     if(segReady && seg && now - lastSegT > 700){
       lastSegT = now;
       try{ const res = seg.segment(c,{keypoint:{x:0.5,y:0.52}}); const m=res.categoryMask; if(m){ const w=m.width,h=m.height,md=m.getAsUint8Array(); const ov=md[Math.floor(h*0.52)*w+Math.floor(w*0.5)]; let fg=0; for(let i=0;i<md.length;i++) if(md[i]===ov) fg++; segFg=fg/md.length; m.close&&m.close(); } }catch(e){}
     }
-    // ---- LIVE check: flag problems in real time and pause capture ----
     let reason = null;
     if(st.lum < 50) reason = 'Too dark — add light';
     else if(st.lum > 228) reason = 'Too bright — reduce glare';
-    else if(skin > 0.12) reason = 'Move your hand out of frame';
-    else if(segFg != null && segFg > 0.6) reason = 'Clear the surface — too much in frame';
-    else if(segFg != null && segFg < 0.05) reason = 'Fill the ring with your item on a plain surface';
+    else if(CFG.skin && skin > 0.12) reason = 'Move your hand out of frame';
+    else if(segFg != null && segFg > CFG.maxFg) reason = 'Clear the surface — too much in frame';
+    else if(segFg != null && segFg < CFG.minFg) reason = 'Fill the ring with your item on a plain surface';
     setLive(reason);
 
     if(!reason){
@@ -210,12 +235,12 @@ function loop(){
       if(diff > 6.5){
         frames.push({canvas:c, lum:st.lum, contrast:st.contrast});
         lastLuma = la; kept++; stale = 0; updateProgress();
-        $('hint').textContent = phase===2 ? 'Great — capturing the underside…' : 'Nice — keep rotating slowly…';
-        if(phase===1 && kept >= P1){ enterCheckpoint(); return; }
-      } else { stale++; if(stale > 6) $('hint').textContent = 'Keep turning — we need new angles.'; }
+        $('hint').textContent = phase===2 ? 'Great — capturing the other side…' : 'Nice — keep going slowly…';
+        if(CFG.flip && phase===1 && kept >= CFG.p1){ enterCheckpoint(); return; }
+      } else { stale++; if(stale > 6) $('hint').textContent = 'Keep moving — we need new angles.'; }
     }
   }
-  if(kept >= TARGET){ finish(); return; }
+  if(kept >= CFG.target){ finish(); return; }
   loopT = setTimeout(loop, 300);
 }
 
@@ -227,9 +252,9 @@ async function startCamera(){
   show('scan');
   scanning = true; kept = 0; lastLuma = null; stale = 0; phase = 1; checkpoint = false; segFg = null; lastSegT = 0; frames = [];
   updateProgress(); setLive(null);
-  $('hint').textContent = 'Rotate the item slowly, all the way around…';
+  $('hint').textContent = CFG.startHint;
   loop();
-  safT = setTimeout(()=>{ if(scanning) finish(); }, 120000);   // 2 min safety cap
+  safT = setTimeout(()=>{ if(scanning) finish(); }, 120000);
 }
 
 async function finish(){
@@ -248,7 +273,7 @@ async function finish(){
         const res=seg.segment(f.canvas,{keypoint:{x:0.5,y:0.52}}); const m=res.categoryMask;
         if(m){
           const w=m.width,h=m.height,md=m.getAsUint8Array();
-          const ov=md[Math.floor(h*0.52)*w+Math.floor(w*0.5)];   // object category is whatever sits under the centre
+          const ov=md[Math.floor(h*0.52)*w+Math.floor(w*0.5)];
           const oc=document.createElement('canvas'); oc.width=w; oc.height=h; const octx=oc.getContext('2d');
           octx.drawImage(f.canvas,0,0,w,h); const im=octx.getImageData(0,0,w,h);
           let fg=0, blown=0; for(let i=0;i<md.length;i++){ if(md[i]!==ov){ im.data[i*4+3]=0; } else { fg++; if(im.data[i*4]>250&&im.data[i*4+1]>250&&im.data[i*4+2]>250) blown++; } }
@@ -263,15 +288,16 @@ async function finish(){
   }
   const avgFg = fgN? fgSum/fgN : null;
   const avgGlare = fgN? glare/fgN : 0;
+  const minAngles = Math.min(12, Math.floor(CFG.target*0.5));
 
   const reasons=[];
-  if(kept < 12) reasons.push(['Not enough angles','Rotate slowly all the way around until the ring fills — and don’t skip the flip for the bottom/back.']);
+  if(kept < minAngles) reasons.push(['Not enough angles','Go slowly all the way around until the ring fills'+(CFG.flip?' — and don’t skip the flip.':'.')]);
   if(avgLum < 55) reasons.push(['Too dark','Find brighter, even light so the whole item is clearly lit.']);
   else if(avgLum > 225) reasons.push(['Overexposed','Reduce harsh light so the item isn’t washed out.']);
   if(avgCon < 16) reasons.push(['Low contrast with the surface','Use a plain surface that stands out from the item.']);
-  if(avgGlare > 0.22) reasons.push(['Too much glare','Angle away from direct light — reflections on hardware, leather or glass break the scan.']);
-  if(avgFg!=null && avgFg < 0.05) reasons.push(['Item not clearly detected','Fill more of the frame and use a plain, empty surface — a busy background (carpet, table, other objects) breaks isolation.']);
-  else if(avgFg!=null && avgFg > 0.6) reasons.push(['Clutter or a hand in view','Clear the surface — remove hands, other objects and busy backgrounds — then re-scan.']);
+  if(avgGlare > 0.22) reasons.push(['Too much glare','Angle away from direct light — reflections on hardware, leather, paint or glass break the scan.']);
+  if(avgFg!=null && avgFg < CFG.minFg*0.9) reasons.push(['Item not clearly detected','Fill more of the frame and use a plain, empty background.']);
+  else if(avgFg!=null && avgFg > CFG.maxFg) reasons.push(['Clutter or a hand in view','Clear the surface — remove hands, other objects and busy backgrounds — then re-scan.']);
 
   if(reasons.length){
     $('reasons').innerHTML = '<b>Fix these, then re-scan</b><ul>'+reasons.map(r=>'<li><b style="color:#fff">'+r[0]+'</b> — '+r[1]+'</li>').join('')+'</ul>';
@@ -280,20 +306,34 @@ async function finish(){
 
   const gal=$('gal'); gal.innerHTML='';
   cutouts.forEach(u=>{ const cell=document.createElement('div'); cell.className='cell'; const img=new Image(); img.src=u; cell.appendChild(img); gal.appendChild(cell); });
-  $('rN').textContent=frames.length; $('rCov').textContent=Math.min(100,Math.round(kept/TARGET*100))+'%';
+  $('rN').textContent=frames.length; $('rCov').textContent=Math.min(100,Math.round(kept/CFG.target*100))+'%';
   $('rSeg').textContent=(segReady && avgFg!=null)?'on':'off';
   $('segwarn').style.display=(segReady && avgFg!=null)?'none':'block';
+  $('doneLead').textContent='Your '+CFG.name.toLowerCase()+' from every angle, background stripped away — what Mulk’s reconstruction turns into your 3D model.';
   show('done');
 }
 
 function stopAll(){ scanning=false; if(loopT) clearTimeout(loopT); if(safT) clearTimeout(safT); if(stream){ stream.getTracks().forEach(t=>t.stop()); } }
-function reset(){ frames=[]; kept=0; lastLuma=null; stale=0; phase=1; checkpoint=false; segFg=null; $('flip').style.display='none'; $('angles').textContent='0 / '+TARGET+' views'; $('covbar').style.width='0'; $('ring').setAttribute('stroke-dasharray','0 999'); setLive(null); }
+function reset(){ frames=[]; kept=0; lastLuma=null; stale=0; phase=1; checkpoint=false; segFg=null; $('flip').style.display='none'; $('angles').textContent='0 / '+CFG.target+' views'; $('covbar').style.width='0'; $('ring').setAttribute('stroke-dasharray','0 999'); setLive(null); }
 
+function choose(key){
+  CFG = ASSETS[key] || ASSETS.watch;
+  $('startTitle').textContent = 'Scan your '+CFG.name.toLowerCase();
+  $('startLead').textContent = CFG.name==='Car'
+    ? 'Walk a full lap — Mulk captures every side and isolates the car from the scene.'
+    : 'Capture every angle'+(CFG.flip?', including the '+(key==='watch'?'case-back':'base'):'')+' — Mulk isolates it from everything around it.';
+  $('tipsList').innerHTML = CFG.tips.map(t=>'<li>'+t+'</li>').join('');
+  $('angles').textContent = '0 / '+CFG.target+' views';
+  show('start');
+}
+
+document.querySelectorAll('.pick-card').forEach(el=>el.addEventListener('click', ()=>choose(el.getAttribute('data-asset'))));
+$('back').addEventListener('click', ()=>show('pick'));
 $('go').addEventListener('click', ()=>{ reset(); loadSeg(); startCamera(); });
 $('finish').addEventListener('click', finish);
-$('flipgo').addEventListener('click', ()=>{ $('flip').style.display='none'; checkpoint=false; phase=2; lastLuma=null; stale=0; $('hint').textContent='Now capture the underside / back…'; loop(); });
+$('flipgo').addEventListener('click', ()=>{ $('flip').style.display='none'; checkpoint=false; phase=2; lastLuma=null; stale=0; $('hint').textContent='Now capture the other side…'; loop(); });
 $('cancel').addEventListener('click', ()=>{ stopAll(); show('start'); });
-$('again').addEventListener('click', ()=>{ reset(); show('start'); });
+$('again').addEventListener('click', ()=>{ reset(); show('pick'); });
 $('retry').addEventListener('click', ()=>{ reset(); show('start'); });
 </script>
 </body>
