@@ -193,15 +193,15 @@ function loop(){
     const now = performance.now();
     if(segReady && seg && now - lastSegT > 700){
       lastSegT = now;
-      try{ const res = seg.segment(c,{keypoint:{x:0.5,y:0.52}}); const m=res.categoryMask; if(m){ const md=m.getAsUint8Array(); let fg=0; for(let i=0;i<md.length;i++) if(md[i]!==0) fg++; segFg=fg/md.length; m.close&&m.close(); } }catch(e){}
+      try{ const res = seg.segment(c,{keypoint:{x:0.5,y:0.52}}); const m=res.categoryMask; if(m){ const w=m.width,h=m.height,md=m.getAsUint8Array(); const ov=md[Math.floor(h*0.52)*w+Math.floor(w*0.5)]; let fg=0; for(let i=0;i<md.length;i++) if(md[i]===ov) fg++; segFg=fg/md.length; m.close&&m.close(); } }catch(e){}
     }
     // ---- LIVE check: flag problems in real time and pause capture ----
     let reason = null;
     if(st.lum < 50) reason = 'Too dark — add light';
     else if(st.lum > 228) reason = 'Too bright — reduce glare';
     else if(skin > 0.12) reason = 'Move your hand out of frame';
-    else if(segFg != null && segFg > 0.72) reason = 'Clear the surface — too much in frame';
-    else if(segFg != null && segFg < 0.03) reason = 'Centre your item in the ring';
+    else if(segFg != null && segFg > 0.6) reason = 'Clear the surface — too much in frame';
+    else if(segFg != null && segFg < 0.05) reason = 'Fill the ring with your item on a plain surface';
     setLive(reason);
 
     if(!reason){
@@ -248,9 +248,10 @@ async function finish(){
         const res=seg.segment(f.canvas,{keypoint:{x:0.5,y:0.52}}); const m=res.categoryMask;
         if(m){
           const w=m.width,h=m.height,md=m.getAsUint8Array();
+          const ov=md[Math.floor(h*0.52)*w+Math.floor(w*0.5)];   // object category is whatever sits under the centre
           const oc=document.createElement('canvas'); oc.width=w; oc.height=h; const octx=oc.getContext('2d');
           octx.drawImage(f.canvas,0,0,w,h); const im=octx.getImageData(0,0,w,h);
-          let fg=0, blown=0; for(let i=0;i<md.length;i++){ if(md[i]===0){ im.data[i*4+3]=0; } else { fg++; if(im.data[i*4]>250&&im.data[i*4+1]>250&&im.data[i*4+2]>250) blown++; } }
+          let fg=0, blown=0; for(let i=0;i<md.length;i++){ if(md[i]!==ov){ im.data[i*4+3]=0; } else { fg++; if(im.data[i*4]>250&&im.data[i*4+1]>250&&im.data[i*4+2]>250) blown++; } }
           fgFrac=fg/md.length; if(fg>0){ glare += blown/fg; }
           if(fgFrac>0.02){ octx.putImageData(im,0,0); outURL=oc.toDataURL('image/png'); }
           m.close&&m.close();
@@ -269,8 +270,8 @@ async function finish(){
   else if(avgLum > 225) reasons.push(['Overexposed','Reduce harsh light so the item isn’t washed out.']);
   if(avgCon < 16) reasons.push(['Low contrast with the surface','Use a plain surface that stands out from the item.']);
   if(avgGlare > 0.22) reasons.push(['Too much glare','Angle away from direct light — reflections on hardware, leather or glass break the scan.']);
-  if(avgFg!=null && avgFg < 0.04) reasons.push(['Item not clearly detected','Fill more of the frame and keep the surface empty.']);
-  else if(avgFg!=null && avgFg > 0.72) reasons.push(['Clutter or a hand in view','Clear the surface — remove hands, other objects and busy backgrounds — then re-scan.']);
+  if(avgFg!=null && avgFg < 0.05) reasons.push(['Item not clearly detected','Fill more of the frame and use a plain, empty surface — a busy background (carpet, table, other objects) breaks isolation.']);
+  else if(avgFg!=null && avgFg > 0.6) reasons.push(['Clutter or a hand in view','Clear the surface — remove hands, other objects and busy backgrounds — then re-scan.']);
 
   if(reasons.length){
     $('reasons').innerHTML = '<b>Fix these, then re-scan</b><ul>'+reasons.map(r=>'<li><b style="color:#fff">'+r[0]+'</b> — '+r[1]+'</li>').join('')+'</ul>';
