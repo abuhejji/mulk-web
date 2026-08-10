@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Mulk · Ops Diagnostics</title>
+<style>
+  :root{--bg:#070d1a;--bg2:#0a1322;--card:#0d1526;--card2:#14213c;--gold:#c9a24b;--gold2:#e6c37a;--text:#f2f5fa;--mut:#8b99b8;--faint:#5a688a;--line:rgba(255,255,255,.08);
+    --live:#2ebd85;--recent:#e0b24a;--stale:#f6465d;--ref:#4d7cc9;--down:#6b7280}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:18px 16px 60px}
+  header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .brand{font-weight:800;letter-spacing:.24em;font-size:18px}.brand span{color:var(--gold)}
+  .sub{color:var(--mut);font-size:12px}
+  .hstat{display:flex;gap:10px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 10px currentColor}
+  .badge{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;display:flex;gap:8px;align-items:center}
+  .btn{background:var(--gold);color:#0a1120;border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  .graphwrap{background:radial-gradient(90% 80% at 50% 45%,#12203a 0%,#070d1a 70%);border:1px solid var(--line);border-radius:20px;padding:6px;margin-bottom:14px;overflow:hidden}
+  svg{width:100%;height:auto;display:block}
+  .hubw{fill:#fff;font-size:19px;font-weight:800;letter-spacing:.14em}
+  .hubs{fill:var(--gold2);font-size:10px;letter-spacing:.2em}
+  .nlab{fill:#e7ecf5;font-size:11.5px;font-weight:700}
+  .ndet{fill:var(--mut);font-size:9.5px}
+  .flow{stroke-dasharray:6 7;animation:flow 1s linear infinite}
+  @keyframes flow{to{stroke-dashoffset:-13}}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:6px 0 2px;font-size:11.5px;color:var(--mut)}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold2);margin-bottom:10px}
+  .rowl{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+  .rowl:first-of-type{border-top:0}
+  .rowl .k{color:var(--mut);display:flex;align-items:center;gap:8px}
+  .rowl .v{font-weight:700;font-variant-numeric:tabular-nums}
+  .pill{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+  .big{font-size:26px;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums}
+  .kpis{display:flex;gap:16px;flex-wrap:wrap}
+  .kpi{flex:1;min-width:90px}.kpi .l{font-size:11px;color:var(--mut);margin-top:2px}
+  .foot{color:var(--faint);font-size:11px;text-align:center;margin-top:22px;line-height:1.6}
+  .loading{color:var(--mut);text-align:center;padding:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">MULK<span>.</span> <span style="color:var(--mut);font-weight:600;letter-spacing:0;font-size:13px">ops diagnostics</span></div>
+      <div class="sub" id="sub">Live system map · data feeds &amp; services</div>
+    </div>
+    <div class="hstat">
+      <span class="badge" id="overall"><span class="dot" style="color:var(--mut)">●</span> <span id="overallTxt">loading…</span></span>
+      <span class="badge" id="updated">—</span>
+      <button class="btn" id="refresh">↻ Refresh</button>
+    </div>
+  </header>
+
+  <div class="graphwrap"><div id="graph" class="loading">Connecting to Mulk…</div></div>
+  <div class="legend">
+    <span><i style="background:var(--live)"></i>Fed today (live)</span>
+    <span><i style="background:var(--recent)"></i>This week</span>
+    <span><i style="background:var(--stale)"></i>Stale / not fed</span>
+    <span><i style="background:var(--ref)"></i>Reference (steady)</span>
+    <span><i style="background:var(--down)"></i>Down</span>
+  </div>
+
+  <div class="grid" id="panels" style="margin-top:14px"></div>
+
+  <p class="foot" id="foot">Auto-refreshes every 30s · reads live from the Mulk master database.<br>Preview ops view — lock behind auth before wider access.</p>
+</div>
+
+<script>
+const SB='https://xgqnenkkfxkpevdyppuf.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhncW5lbmtrZnhrcGV2ZHlwcHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTI1NjcsImV4cCI6MjA5ODc2ODU2N30.qT6ffPiWDX9rUnvGEVg9e3wmNfDuo3G4LBADz6aGqbI';
+const COL={live:'#2ebd85',recent:'#e0b24a',stale:'#f6465d',reference:'#4d7cc9',down:'#6b7280'};
+let lastAt=null;
+
+const fmt=n=>{n=Number(n||0); if(n>=1e6)return (n/1e6).toFixed(n>=1e7?0:1)+'M'; if(n>=1e3)return (n/1e3).toFixed(n>=1e4?0:1)+'k'; return ''+n;};
+const money=n=> n==null?'—':'$'+fmt(n);
+function ago(ts){ if(!ts)return '—'; const s=Math.max(0,(Date.now()-new Date(ts))/1000); if(s<60)return Math.round(s)+'s ago'; if(s<3600)return Math.round(s/60)+'m ago'; if(s<86400)return Math.round(s/3600)+'h ago'; return Math.round(s/86400)+'d ago'; }
+function esc(s){return (''+s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function graph(streams){
+  const feeds=streams.filter(s=>s.grp!=='Reference');
+  const cx=450,cy=320,rx=340,ry=232;
+  let lines='',nodes='';
+  feeds.forEach((s,i)=>{
+    const a=(i/feeds.length)*Math.PI*2 - Math.PI/2;
+    const x=cx+rx*Math.cos(a), y=cy+ry*Math.sin(a);
+    const col=COL[s.status]||COL.down;
+    const flow=s.status==='live'?'flow':'';
+    const w=s.status==='live'?2.6:s.status==='stale'?1.3:1.8;
+    const op=s.status==='stale'?0.45:0.92;
+    lines+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(0)}" y2="${y.toFixed(0)}" stroke="${col}" stroke-width="${w}" opacity="${op}" class="${flow}"/>`;
+    const right=Math.cos(a)>=-0.15; const anchor=right?'start':'end'; const tx=x+(right?15:-15);
+    nodes+=`<g><circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="9" fill="${col}" stroke="#0a1120" stroke-width="1.5"><title>${esc(s.label)} — ${s.status} — ${esc(s.detail||'')} — ${ago(s.last_ts)}</title></circle>`+
+      `<text x="${tx.toFixed(0)}" y="${(y-1).toFixed(0)}" text-anchor="${anchor}" class="nlab">${esc(s.label)}</text>`+
+      `<text x="${tx.toFixed(0)}" y="${(y+12).toFixed(0)}" text-anchor="${anchor}" class="ndet">${fmt(s.cnt)} · ${s.status}</text></g>`;
+  });
+  return `<svg viewBox="0 0 900 660" xmlns="http://www.w3.org/2000/svg"><defs>
+    <radialGradient id="hub" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#26406e"/><stop offset="1" stop-color="#0c1730"/></radialGradient></defs>
+    ${lines}
+    <g><circle cx="${cx}" cy="${cy}" r="56" fill="url(#hub)" stroke="#c9a24b" stroke-width="2"/>
+       <text x="${cx}" y="${cy-3}" text-anchor="middle" class="hubw">MULK</text>
+       <text x="${cx}" y="${cy+15}" text-anchor="middle" class="hubs">MASTER DB</text></g>
+    ${nodes}
+  </svg>`;
+}
+
+function row(k,v,dotcol,pill){
+  const d=dotcol?`<span class="dot" style="color:${dotcol}">●</span>`:'';
+  const p=pill?`<span class="pill" style="background:${pill.bg};color:${pill.fg}">${pill.t}</span>`:'';
+  return `<div class="rowl"><span class="k">${d}${esc(k)}</span><span class="v">${v} ${p}</span></div>`;
+}
+
+function panels(d){
+  const P=[];
+  // crons
+  let c='<div class="panel"><h3>⏱ Scheduled jobs</h3>';
+  d.crons.forEach(j=>{ const ok=j.last_status==='succeeded'; const col=ok?COL.live:(j.last_status?COL.stale:COL.down);
+    c+=row(j.name.replace('mulk-',''), `<span style="color:var(--mut);font-weight:500;font-size:11px">${esc(j.schedule)}</span> ${ago(j.last_run)}`, col,
+      {t:j.last_status||'never',bg:ok?'#0e3a2b':'#3a1420',fg:ok?'#7ff0c8':'#ffb3bd'}); });
+  c+='</div>'; P.push(c);
+  // reference catalogues
+  const refs=d.streams.filter(s=>s.grp==='Reference');
+  let r='<div class="panel"><h3>📚 Reference catalogues</h3>';
+  refs.forEach(s=>{ r+=row(s.label.replace(' catalogue','').replace(' valuation rules',''), fmt(s.cnt)+' <span style="color:var(--mut);font-weight:500;font-size:11px">'+esc(s.detail)+'</span>', COL.reference); });
+  r+='</div>'; P.push(r);
+  // today's snapshot
+  let a='<div class="panel"><h3>📈 Today’s asset snapshot</h3>';
+  d.assets.forEach(x=>{ const val = x.value_usd!=null?money(x.value_usd):(x.index!=null?('idx '+x.index):'—');
+    a+=row(x.class.replace('_',' '), fmt(x.count)+' · '+val, COL.reference); });
+  a+='</div>'; P.push(a);
+  // auth
+  const au=d.auth;
+  P.push(`<div class="panel"><h3>🔐 Auth &amp; KYC</h3>
+    <div class="kpis"><div class="kpi"><div class="big">${fmt(au.users)}</div><div class="l">users</div></div>
+    <div class="kpi"><div class="big">${fmt(au.new_today)}</div><div class="l">new today</div></div>
+    <div class="kpi"><div class="big">${fmt(au.plus)}</div><div class="l">Plus</div></div></div>
+    ${row('KYC pending',fmt(au.kyc_pending),au.kyc_pending>0?COL.recent:COL.down)}
+    ${row('KYC verified',fmt(au.kyc_verified),COL.live)}
+    <div style="color:var(--faint);font-size:10.5px;margin-top:8px">Login-error logs live in Supabase Auth logs (not exposed here).</div></div>`);
+  // payments
+  const pm=d.payments;
+  P.push(`<div class="panel"><h3>💳 Payments</h3>
+    ${row('Active subscriptions',fmt(pm.subs_active),pm.subs_active>0?COL.live:COL.down)}
+    ${row('Billing events',fmt(pm.events),pm.events>0?COL.live:COL.down)}
+    ${row('Last event',ago(pm.last_event),COL.down)}
+    <div style="color:var(--faint);font-size:10.5px;margin-top:8px">Provider webhook not yet connected.</div></div>`);
+  // feedback
+  const fb=d.feedback;
+  P.push(`<div class="panel"><h3>🚩 Valuation feedback</h3>
+    ${row('Total reports',fmt(fb.total),fb.total>0?COL.live:COL.down)}
+    ${row('Last 7 days',fmt(fb.recent7d),fb.recent7d>0?COL.live:COL.down)}
+    ${row('Latest',ago(fb.last),COL.down)}</div>`);
+  // social
+  let so='<div class="panel"><h3>📣 Social &amp; domain</h3>';
+  d.social.forEach(s=>{ const okk=s.status==='connected'; so+=row(s.net+' '+s.handle, s.status.replace('_',' '), okk?COL.live:COL.recent,
+    {t:okk?'ok':'setup',bg:'#3a3014',fg:'#f6d98a'}); });
+  so+='<div style="color:var(--faint);font-size:10.5px;margin-top:8px">Connect IG/TikTok APIs to monitor reach &amp; mentions live.</div></div>';
+  P.push(so);
+  return P.join('');
+}
+
+function overall(d){
+  const feeds=d.streams.filter(s=>s.grp!=='Reference');
+  const cronFail=d.crons.some(j=>j.last_status && j.last_status!=='succeeded');
+  const anyStale=feeds.some(s=>s.status==='stale');
+  const allLiveOrRecent=feeds.every(s=>s.status==='live'||s.status==='recent');
+  if(cronFail||anyStale) return {t:'Attention needed',c:COL.stale};
+  if(allLiveOrRecent) return {t:'All systems nominal',c:COL.live};
+  return {t:'Degraded',c:COL.recent};
+}
+
+async function load(){
+  try{
+    const r=await fetch(SB+'/rest/v1/rpc/mulk_diagnostics',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:'{}'});
+    const d=await r.json();
+    if(!d||!d.streams) throw new Error('no data');
+    document.getElementById('graph').className='';
+    document.getElementById('graph').innerHTML=graph(d.streams);
+    document.getElementById('panels').innerHTML=panels(d);
+    const ov=overall(d);
+    document.getElementById('overall').innerHTML=`<span class="dot" style="color:${ov.c}">●</span> <span>${ov.t}</span>`;
+    lastAt=new Date(d.generated_at);
+    tick();
+  }catch(e){
+    document.getElementById('graph').innerHTML='<div class="loading">Could not reach diagnostics: '+esc(e.message)+'</div>';
+  }
+}
+function tick(){ if(lastAt) document.getElementById('updated').textContent='updated '+ago(lastAt); }
+
+document.getElementById('refresh').addEventListener('click',load);
+load();
+setInterval(load,30000);
+setInterval(tick,1000);
+</script>
+</body>
+</html>
